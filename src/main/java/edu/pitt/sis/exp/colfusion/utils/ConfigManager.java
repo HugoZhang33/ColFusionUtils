@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -299,5 +303,31 @@ public final class ConfigManager {
 	void loadTestProperties() {
 		loadPropertiesFromResoruceFile(this.properties, CONFIG_TEST_DEFAULT_FILE_NAME, false);
 		loadPropertiesFromResoruceFile(this.properties, CONFIG_TEST_FILE_NAME, false);
+	}
+	
+	/**
+	 * Get the subset of the properties that have specified prefix.
+	 * 
+	 * @param propertiesKeysPrefix
+	 * 		the property keys prefix
+	 * @return all properties that have specified prefix.
+	 */
+	public List<String> getPropertyKeysForPrefix( 
+			final String propertiesKeysPrefix) {
+		Pattern pattern = Pattern.compile("^"+ Pattern.quote(propertiesKeysPrefix)); // strings that start with given prefix
+		
+		List<String> result = new ArrayList<String>();
+		//TODO: once we update to java 8, this is a good candidate for lamdas
+		for (Object propertyKey : properties.keySet()) {
+			Matcher matcher = pattern.matcher(propertyKey.toString());
+			
+			if (matcher.find()) {
+				result.add(propertyKey.toString());
+			}
+		}
+		
+		//TODO: maybe also include system props
+		
+		return result;
 	}
 }
